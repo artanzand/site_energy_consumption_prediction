@@ -1,0 +1,11 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: 1_intro
+chapters:
+- file: 2_EDA-R
+- file: 3_EDA-Python
+- file: 4_Feature_Eng
+- file: 5_ML
+- file: 6_Appendix

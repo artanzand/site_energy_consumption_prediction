@@ -1,0 +1,79 @@
+---
+title: "MICE"
+author: "Thomas Siu"
+date: "1/30/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(survival, quietly = TRUE)
+library(mice, quietly = TRUE)
+library(tidyverse, quietly = TRUE)
+library(broom, quietly = TRUE)
+library(ggfortify, quietly = TRUE)
+```
+
+Import data
+
+```{r}
+df <- read_csv("../data/train_facility.csv")
+df_test <- read_csv("../data/test_facility.csv")
+```
+
+## Plot linear regression between facility and energy star rating
+
+You can also embed plots, for example:
+
+```{r}
+df |> ggplot(aes(y = building_class, x = energy_star_rating)) +
+  geom_boxplot()
+```
+
+```{r}
+
+climate_site_eui <- df |> 
+  select(site_eui, facility_class, energy_star_rating, id)
+
+climate_site_eui_test <- df_test |> 
+  select(facility_class, floor_area, energy_star_rating, id)
+
+
+set.seed(123)
+
+climate_mult_imp <- mice(data = climate_site_eui, m = 15, printFlag = FALSE)
+climate_mult_imp
+
+climate_mult_imp_test <- mice(data = climate_site_eui_test, m = 15, printFlag = FALSE)
+climate_mult_imp_test
+```
+
+```{r}
+
+full_climate <- complete(climate_mult_imp, "long")
+energy_star_imp <- full_climate |> 
+  group_by(facility_class) |> 
+  summarise(mean(energy_star_rating)) |>
+  rename(energy_star_rating_imp = `mean(energy_star_rating)`)
+
+
+write_csv(energy_star_imp, "../data/energy_star_imp.csv")
+
+full_climate_test <- complete(climate_mult_imp_test, "long")
+energy_star_imp_test <- full_climate_test |> 
+  group_by(id) |> 
+  summarise(mean(energy_star_rating))
+energy_star_imp_test <- energy_star_imp_test |>
+  rename(energy_star_rating = `mean(energy_star_rating)`)
+
+
+write_csv(energy_star_imp, "../data/energy_star_imp.csv")
+write_csv(energy_star_imp_test, "../data/energy_star_imp_test.csv")
+```
+
+```{r}
+
+df |> ggplot(aes(site_eui, days_below_30F)) +
+  geom_point() + 
+  geom_smooth(method = 'lm')
+```
