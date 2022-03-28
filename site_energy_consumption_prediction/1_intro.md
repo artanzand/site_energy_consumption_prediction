@@ -2,7 +2,7 @@
 
 This notebook is for WiDS Datathon 2022 [Here](https://www.kaggle.com/c/widsdatathon2022/overview)
 
-Author: Artan, Macy Chan, Margot, Thomas
+Author: Artan Zandian, Macy Chan, Thomas Siu
 
 
 
